@@ -14,10 +14,10 @@
     <script>
         async function sendMessage() {
             const userInput = document.getElementById("user-input").value;
-            const apiKey = "sk-svcacct-7lPb3d9E4PNS3h3MSu7goSwrnwxknIe3UsRIZN6Imm2kl-St3U4OcChVk1m2DT3BlbkFJ4QjYdajzRnxNeZvjFo7QDA4l1DqHIBr92foiYHW6tuCSyMnLqfGrl9ojIyaAA"; // Replace with your actual API key
+            const apiKey = "sk-svcacct-7lPb3d9E4PNS3h3MSu7goSwrnwxknIe3UsRIZN6Imm2kl-St3U4OcChVk1m2DT3BlbkFJ4QjYdajzRnxNeZvjFo7QDA4l1DqHIBr92foiYHW6tuCSyMnLqfGrl9ojIyaAA"; // Replace with your actual API key, but move this to a server-side script!
 
             try {
-                const response = await fetch("https://api.openai.com/v1/completions", {
+                const response = await fetch("https://api.openai.com/v1/chat/completions", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -25,14 +25,18 @@
                     },
                     body: JSON.stringify({
                         model: "gpt-3.5-turbo",
-                        prompt: userInput,
+                        messages: [{ role: "user", content: userInput }],
                         max_tokens: 50,
                         temperature: 0.7
                     })
                 });
 
                 const data = await response.json();
-                document.getElementById("response-output").textContent = JSON.stringify(data, null, 2);
+                if (data.choices && data.choices.length > 0) {
+                    document.getElementById("response-output").textContent = data.choices[0].message.content;
+                } else {
+                    document.getElementById("response-output").textContent = "No response from AI.";
+                }
             } catch (error) {
                 console.error("Error:", error);
                 document.getElementById("response-output").textContent = "Error: " + error;
